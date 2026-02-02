@@ -3,7 +3,11 @@
 from langgraph.graph import StateGraph, START, END
 from typing import TypedDict, Annotated
 from langchain_core.messages import BaseMessage, HumanMessage
+<<<<<<< HEAD
 from langchain_groq import ChatGroq
+=======
+from langchain_google_genai import ChatGoogleGenerativeAI
+>>>>>>> 6a8e628b56587b8045394ad6952cf21415db01c4
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
@@ -19,6 +23,7 @@ load_dotenv()
 # -------------------
 # 1. LLM
 # -------------------
+<<<<<<< HEAD
 groq_api_key = os.getenv("GROQ_API_KEY")
 
 llm = ChatGroq(
@@ -27,6 +32,16 @@ llm = ChatGroq(
     temperature=0
 )
 print("✓ Using model: mixtral-8x7b-32768")
+=======
+os.environ["GOOGLE_API_KEY"] = "AIzaSyCi6AKnl826Ql_4MotHHAVtl_-_aAmAui4"
+
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.0-flash-exp",
+    google_api_key=os.environ["GOOGLE_API_KEY"],
+    convert_system_message_to_human=True
+)
+print("✓ Using model: gemini-2.0-flash-exp")
+>>>>>>> 6a8e628b56587b8045394ad6952cf21415db01c4
 
 # -------------------
 # 2. Tools

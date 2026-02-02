@@ -26,6 +26,7 @@ def load_conversation(thread_id):
 
 
 # **************************************** Session Setup ******************************
+
 if 'message_history' not in st.session_state:
     st.session_state['message_history'] = []
 
@@ -83,8 +84,6 @@ if user_input:
     st.session_state['message_history'].append({'role': 'user', 'content': user_input})
     with st.chat_message('user'):
         st.text(user_input)
-
-    #CONFIG = {'configurable': {'thread_id': st.session_state['thread_id']}}
 
     CONFIG = {
         "configurable": {"thread_id": st.session_state["thread_id"]},
