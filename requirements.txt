@@ -76,7 +76,3 @@ urllib3==2.5.0
 watchdog==6.0.0
 xxhash==3.5.0
 zstandard==0.23.0
-<<<<<<< HEAD
-=======
-langchain-google-genai
->>>>>>> 6a8e628b56587b8045394ad6952cf21415db01c4
