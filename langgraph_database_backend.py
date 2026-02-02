@@ -1,7 +1,7 @@
 from langgraph.graph import StateGraph, START, END
 from typing import TypedDict, Annotated
 from langchain_core.messages import BaseMessage, HumanMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph.message import add_messages
 from dotenv import load_dotenv
@@ -10,14 +10,14 @@ import os
 
 load_dotenv()
 
-os.environ["GOOGLE_API_KEY"] = "AIzaSyCi6AKnl826Ql_4MotHHAVtl_-_aAmAui4"
+groq_api_key = os.getenv("GROQ_API_KEY")
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash-exp",
-    google_api_key=os.environ["GOOGLE_API_KEY"],
-    convert_system_message_to_human=True
+llm = ChatGroq(
+    model="llama-3.3-70b-versatile",
+    groq_api_key=groq_api_key,
+    temperature=0
 )
-print("✓ Using model: gemini-2.0-flash-exp")
+print("✓ Using model: llama-3.3-70b-versatile")
 
 
 class ChatState(TypedDict):
@@ -47,3 +47,19 @@ def retrieve_all_threads():
         all_threads.add(checkpoint.config['configurable']['thread_id'])
 
     return list(all_threads)
+
+def get_chat_summary(thread_id):
+    """Generate a summary of the chat based on the first user message"""
+    state = chatbot.get_state(config={'configurable': {'thread_id': thread_id}})
+    messages = state.values.get('messages', [])
+    
+    if messages:
+        for msg in messages:
+            if isinstance(msg, HumanMessage):
+                # Get first user message and limit to 50 chars
+                summary = msg.content[:50]
+                if len(msg.content) > 50:
+                    summary += "..."
+                return summary
+    
+    return f"Chat {str(thread_id)[:8]}"

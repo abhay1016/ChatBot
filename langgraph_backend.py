@@ -1,6 +1,6 @@
 from langgraph.graph import StateGraph, START, END
 from typing import TypedDict, Annotated
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.messages import BaseMessage
 from langgraph.graph.message import add_messages
 from langgraph.checkpoint.memory import MemorySaver
@@ -9,15 +9,15 @@ import os
 
 load_dotenv()
 
-# Set API key (remove from code in production!)
-os.environ["GOOGLE_API_KEY"] = "AIzaSyCi6AKnl826Ql_4MotHHAVtl_-_aAmAui4"
+# Set API key from environment
+groq_api_key = os.getenv("GROQ_API_KEY")
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash-exp",
-    google_api_key=os.environ["GOOGLE_API_KEY"],
-    convert_system_message_to_human=True
+llm = ChatGroq(
+    model="mixtral-8x7b-32768",
+    groq_api_key=groq_api_key,
+    temperature=0
 )
-print("✓ Using model: gemini-2.0-flash-exp")
+print("✓ Using model: mixtral-8x7b-32768")
 
 
 class ChatState(TypedDict):

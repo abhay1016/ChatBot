@@ -1,5 +1,5 @@
 import streamlit as st
-from langgraph_database_backend import chatbot, retrieve_all_threads
+from langgraph_database_backend import chatbot, retrieve_all_threads, get_chat_summary
 from langchain_core.messages import HumanMessage
 import uuid
 
@@ -48,7 +48,10 @@ if st.sidebar.button('New Chat'):
 st.sidebar.header('My Conversations')
 
 for thread_id in st.session_state['chat_threads'][::-1]:
-    if st.sidebar.button(str(thread_id)):
+    # Get chat summary instead of showing thread ID
+    chat_summary = get_chat_summary(thread_id)
+    
+    if st.sidebar.button(chat_summary, key=str(thread_id)):
         st.session_state['thread_id'] = thread_id
         messages = load_conversation(thread_id)
 
@@ -62,6 +65,7 @@ for thread_id in st.session_state['chat_threads'][::-1]:
             temp_messages.append({'role': role, 'content': msg.content})
 
         st.session_state['message_history'] = temp_messages
+        st.rerun()
 
 
 # **************************************** Main UI ************************************
