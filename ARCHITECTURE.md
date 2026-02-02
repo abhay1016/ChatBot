@@ -110,41 +110,28 @@ graph LR
 
 ```mermaid
 stateDiagram-v2
-    [*] --> InitialState
+    [*] --> InitState
     
-    InitialState: ChatState
-    InitialState: messages: []
-    
-    UserInput: Receive User Input
-    UserInput: Add HumanMessage
-    
+    InitState: Initial ChatState
+    UserInputState: User Message Added
     ProcessState: Chat Node Execution
-    ProcessState: Call LLM with messages
+    ResponseState: LLM Response Received
+    UpdateState: ChatState Updated
+    SaveState: Checkpoint Saved
+    OutputState: Response Streamed
     
-    GetResponse: LLM Response
-    GetResponse: Stream tokens
-    
-    UpdateState: Update ChatState
-    UpdateState: Add AIMessage
-    
-    SaveCheckpoint: Save to SQLite
-    SaveCheckpoint: Via Checkpointer
-    
-    OutputResponse: Return to UI
-    OutputResponse: Stream to user
-    
-    InitialState --> UserInput: message received
-    UserInput --> ProcessState: invoke chat_node
-    ProcessState --> GetResponse: llm.invoke()
-    GetResponse --> UpdateState: add response
-    UpdateState --> SaveCheckpoint: persist state
-    SaveCheckpoint --> OutputResponse: stream response
-    OutputResponse --> [*]
+    InitState --> UserInputState: message received
+    UserInputState --> ProcessState: invoke chat_node
+    ProcessState --> ResponseState: call llm.invoke()
+    ResponseState --> UpdateState: add AIMessage
+    UpdateState --> SaveState: persist to SQLite
+    SaveState --> OutputState: stream to user
+    OutputState --> [*]
     
     note right of ProcessState
-        State Graph compiles with:
-        - START → chat_node → END
-        - Checkpointer: SqliteSaver
+        StateGraph compiles with:
+        START → chat_node → END
+        Checkpointer: SqliteSaver
     end note
 ```
 
