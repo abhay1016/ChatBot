@@ -147,16 +147,26 @@ def reset_chat():
     st.rerun()
 
 def delete_current_chat():
-    """Delete the current chat history"""
+    """Delete the current chat from session"""
     if st.session_state['thread_id'] in st.session_state['session_threads']:
         st.session_state['session_threads'].remove(st.session_state['thread_id'])
-    reset_chat()
+    # Reset to new chat
+    thread_id = generate_thread_id()
+    st.session_state['thread_id'] = thread_id
+    st.session_state['session_threads'].append(thread_id)
+    st.session_state['message_history'] = []
+    st.success("✅ Chat deleted!")
+    st.rerun()
 
 def clear_all_history():
     """Clear all chat history for this session"""
     st.session_state['session_threads'] = []
     st.session_state['message_history'] = []
-    reset_chat()
+    thread_id = generate_thread_id()
+    st.session_state['thread_id'] = thread_id
+    st.session_state['session_threads'].append(thread_id)
+    st.success("✅ All chats cleared!")
+    st.rerun()
 
 def load_conversation(thread_id):
     state = chatbot.get_state(config={'configurable': {'thread_id': thread_id}})
@@ -172,9 +182,8 @@ if 'thread_id' not in st.session_state:
     st.session_state['thread_id'] = generate_thread_id()
 
 if 'session_threads' not in st.session_state:
-    # Only get threads for this session (all threads in this case, but session_id ensures isolation)
-    all_threads = retrieve_all_threads()
-    st.session_state['session_threads'] = all_threads if all_threads else []
+    # Only show threads for this session (not from database)
+    st.session_state['session_threads'] = [generate_thread_id()]
 
 # Add current thread if not exists
 if st.session_state['thread_id'] not in st.session_state['session_threads']:
@@ -204,7 +213,7 @@ with st.sidebar:
             if chat_summary is None:
                 chat_summary = f"Chat {str(thread_id)[:8]}"
             
-            col1, col2 = st.columns([5, 1])
+            col1, col2 = st.columns([4, 1])
             with col1:
                 if st.button(
                     f"💭 {chat_summary}", 
@@ -220,6 +229,14 @@ with st.sidebar:
                         temp_messages.append({'role': role, 'content': msg.content})
                     
                     st.session_state['message_history'] = temp_messages
+                    st.rerun()
+            
+            with col2:
+                if st.button("🗑️", key=f"delete_{thread_id}", help="Delete this chat"):
+                    st.session_state['session_threads'].remove(thread_id)
+                    if st.session_state['thread_id'] == thread_id:
+                        reset_chat()
+                    st.success("✅ Deleted!")
                     st.rerun()
     else:
         st.info("📭 No conversations yet. Start a new chat!")
